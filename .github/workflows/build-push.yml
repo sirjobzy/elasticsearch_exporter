@@ -3,8 +3,7 @@ name: Build and Push Docker Image to ECR
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,6 +13,18 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.19" # Specify your required Go version
+
+      - name: Build Go binary
+        run: |
+          # Create the output directory if it doesn't exist.
+          mkdir -p .build/linux-amd64
+          # Build the binary targeting Linux and amd64.
+          GOOS=linux GOARCH=amd64 go build -o .build/linux-amd64/elasticsearch_exporter ./cmd/elasticsearch_exporter
 
       # Step 2: Set up Docker Buildx (optional but recommended for advanced build features)
       - name: Set up Docker Buildx
